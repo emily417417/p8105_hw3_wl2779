@@ -90,8 +90,106 @@ mean_hour_coffee=
 ```
 
 
+##Description in Problem1 dataset##
 
+!!!!!!!!!!!!!!!!!!!!
 
+## Problem 2
 
+```{r data input}
+library(p8105.datasets)
+data("brfss_smart2010")
+```
 
+```{r data_cleaning}
+brfss=
+  brfss_smart2010 %>%
+  janitor::clean_names() %>%
+  filter(topic=="Overall Health") %>%
+  filter(response=="Excellent"|response=="Poor") %>%
+  arrange(desc(response)) %>%
+  rename(state=locationabbr) %>%
+  rename(location=locationdesc)
+```
+
+Now, the data is well cleaned.
+
+```{r q1}
+##2010
+brfss_q1_2010=
+  brfss %>%
+  group_by(year,state) %>%
+  summarise(number=n_distinct(location))%>%
+  filter(year==2010)%>%
+  filter(number>=7) %>%
+  arrange(year,state,number)
+
+## 2002
+brfss_q1_2002=
+  brfss %>%
+  group_by(year,state) %>%
+  summarise(number=n_distinct(location))%>%
+  filter(year==2002)%>%
+  filter(number>=7) %>%
+  arrange(year,state,number)
+```
+
+```{r q1 summary}
+brfss_q1_2010
+brfss_q1_2002
+```
+
+In 2002,CT,FL,MA,NC,NJ,PA were observed at 7 or more locations.
+In 2010,CA,CO,FL,MA,MD,NC,NE,NJ,NY,OH,PA,SC,TX,WA were observed at 7 or more locations.
+
+```{r q2 data cleaning}
+brfss_q2=
+  brfss %>%
+  filter(response=="Excellent") %>%
+  group_by(state,year)%>%
+  summarize(average=mean(data_value))%>%
+  arrange(state,year,average)
+```
+
+```{r q2 plot}
+ggplot(data = brfss_q2, aes(x = year, y = average, color = state)) + 
+  geom_point() + 
+  geom_line(data = brfss_q2)+
+   labs(
+    title = " The average value over time within a state ",
+    x = "Year",
+    y = "The average data value across locations within a state",
+    caption = "Data from BRFSS"
+   )
+```
+
+From the gglots output, we can know that for each state, the average data value across locations are fluctuate over time from 2002 to 2010.  
+
+```{r q3 data cleaning for 2006}
+brfss_q3=
+  brfss %>%
+  filter(state=="NY")%>%
+  filter(year==2006|year==2010)%>%
+  group_by(response)%>%
+  arrange(desc(response)) %>%
+  select(year,state,response,data_value)
+```
+
+```{r}
+brfss_q3
+```
+
+```{r}
+ggplot(data = brfss_q3, aes(x = response, y = data_value, color=response)) + 
+  geom_point() +
+   labs(
+    title = " The distribution of data_value for responses among locations in NY State ",
+    x = "Response",
+    y = "data_value",
+    caption = "Data from BRFSS"
+   )+
+  facet_grid(~year)
+```
+
+From the two pane plots, we can know that in both 2006 and 2010, the data_value in excellent response group is distributed in higher value than the Poor response group
 
