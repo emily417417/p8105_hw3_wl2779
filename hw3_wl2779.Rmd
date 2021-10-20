@@ -7,24 +7,91 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
 ```
 
-## R Markdown
+## Problem 1
+## some notes: 1,384,617  size, 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r data input & look at sisle}
+library(p8105.datasets)
+data("instacart")
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+aisle_number=count(instacart,aisle)
+arrange(aisle_number,desc(n))
+```
+There are #134 aisles and ["Fresh vegetables"] aisles are the most items ordered from.
 
-```{r cars}
-summary(cars)
+
+```{r plots}
+aisle_plots=
+  aisle_number %>% 
+  filter(n > 10000) %>% 
+  ggplot(aes(x = aisle, y = n)) + 
+  geom_point(aes(color = aisle)) +
+  labs(
+    title = "Aisle plot",
+    x = "The name of the aisle",
+    y = "The number of items ordered in each aisle",
+    caption = "Data from the instacart"
+   )
+  aisle_plots
+```
+Above is the plots that shows the the number of items ordered in each aisle.
+
+```{r table of 3 most popular items_data cleaning}
+aisle_table_popular=
+  select(instacart,aisle, product_name)%>%
+  filter( aisle=="baking ingredients" |aisle=="dog food care"| aisle=="packaged vegetables fruits" ) %>%
+  group_by(aisle,product_name) %>%
+  summarize(n_obs = n()) %>%
+  top_n(3)%>%
+  arrange(desc(n_obs))
 ```
 
-## Including Plots
+```{r table of 3 most popular items}
+knitr::kable(aisle_table_popular,
+             caption="Top 3 most popular items by Aisle groups",
+             format="simple",
+             col.name=str_to_title(names(aisle_table_popular)))
+```
+Above is the table that showing the Top 3 most popular items by selected 3 Aisle groups.
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r table of mean hour_data cleaning}
+mean_hour=
+  select(instacart,order_dow, order_hour_of_day,product_name)%>%
+  filter( product_name=="Pink Lady Apples" | product_name=="Coffee Ice Cream") %>%
+  group_by(product_name,order_dow) %>%
+  summarize(mean = mean(order_hour_of_day)) 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+mean_hour
+```
+
+## need to make table!!!!!!!!!
+
+```{r human_read_table}
+mean_hour_coffee=
+  mean_hour%>%
+  filter( product_name=="Coffee Ice Cream" )%>%
+  mutate(
+    mm= recode(order_dow, 
+    "Sunday"="0",
+    "Monday"="1",
+    "Tuesday"="2",
+    "Wednesday"="3",
+    "Thursday"="4",
+    "Friday"="5",
+    "Saturday"="6")
+  )%>%
+  select(mm,product_name)
+```
+
+
+
+
+
+
+
