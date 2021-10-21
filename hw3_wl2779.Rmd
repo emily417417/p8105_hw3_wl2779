@@ -67,10 +67,12 @@ mean_hour=
 ```
 
 ```{r}
-mean_hour
+knitr::kable(mean_hour,
+             caption=" the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week",
+             format="simple",
+             col.name=str_to_title(names(mean_hour)))
 ```
-
-## need to make table!!!!!!!!!
+From the table we know that each product has preferenced order hour, ice cream are usually ordered at later time at the day for average. Pink Lady Apples are ordered later time on Wednesday.
 
 ```{r human_read_table}
 mean_hour_coffee=
@@ -89,10 +91,8 @@ mean_hour_coffee=
   select(mm,product_name)
 ```
 
-
-##Description in Problem1 dataset##
-
-!!!!!!!!!!!!!!!!!!!!
+##Description in Problem 1 dataset##
+There are #134 aisles and ["Fresh vegetables"] aisles are the most items ordered from.From the analysis we know that each product has preferenced order hour, ice cream are usually ordered at later time at the day for average. Pink Lady Apples are ordered later time on Wednesday.
 
 ## Problem 2
 
